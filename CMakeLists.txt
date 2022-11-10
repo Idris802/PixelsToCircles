@@ -4,5 +4,5 @@ project(PixelsToCircles)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(PixelsToCircles
-        main.cpp
+        src/main.cpp
         README.md)
