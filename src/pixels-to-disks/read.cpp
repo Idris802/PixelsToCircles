@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -14,61 +15,52 @@ namespace project {
         file >> x >> y;
 
         std::cout << x << "\t" << y << std::endl;
-
-        std::vector<std::vector<int>> columns;
-        std::string image;
-
-        while (std::getline(file, image)) {
-            int num = 0;
-            std::vector<int> row;
-            row.reserve(x);
-
-            for (int bit: image) {
-                if (num % x == 0) {
-                    std::cout << std::endl;
-                    //std::vector<int> row;
-                    //row.reserve(x);
-                    row.clear(); // Removes all elements from the vector
-                }
-                if (bit == -1) {
-                    row[num % x] = -bit;
-                }
-                else{
-                    row[num % x] = bit;
-                }
-
-                // This is the one that prints current bit
-                //std::cout << row[num % x];
-
-                if (num % x == (x-1)){
-                    // Print out row
-                    for (int j=0; j<row.capacity(); j++){std::cout << row[j];}
-                    // Append row to columns
-                    //columns.push_back(row);
-                    //columns[((num+1)/x) - 1] = row;
-                    //std::copy(row.begin(), row.end(), std::back_inserter(columns));
-                    std::vector<int> v2;
-                    v2.assign(row.begin(), row.end());
-                    columns.push_back(v2);
-                }
-                num++;
-            } // for bit in image
-
-        } // while
-
-        return columns;
+        
+        // construct 2D vector where the outer vector has x elements, each of which is a vector with y elements
+        std::vector<std::vector<int>> figure(x, std::vector<int>(y));
+        
+        // attention! there is a line break character that we need to get rid of
+        char pixel;
+        file.get(pixel);
+        
+        // read in file into the vector such that vector[x][y] contains the value of pixel (x, y) as 0 or 1
+        // note that the file format contains the pixels in (y, x) ascending order
+        //
+        for(int j = 0; j < y; j++)
+           for(int i = 0; i < x; i++)
+           {
+              assert(!file.eof());
+              file.get(pixel);
+              if(pixel) figure[i][j] = 1;
+              else figure[i][j] = 0;
+           }
+       if(!file.eof())
+       {
+          std::cout << "remaining content of file:\n";
+          while(!file.eof())
+          {
+             file.get(pixel);
+             std::cout << "\t'" << pixel << "' (ASCII " << (unsigned)pixel % 256 << ")\n";
+          }
+       }
+       
+       file.close();
+       return figure;
     } // get_vect
-
 } // namespace
 
 
-int main() {
+int main(int argc, char** argv) {
     auto source = std::ifstream();
-    std::vector<std::vector<int>> columns = project::get_vect("../benchmark.0032.pxl");
+    auto columns = project::get_vect(argv[1]);
     //project::in(&source);
 
     std::cout << "\n-----\n-----\n-----\n";
     // Print out image
+    //
+    // you are printing it out in order of columns: note that this turns the picture around graphically!
+    // but I left it as is, it's clearly what you were intending to do
+    //
     for(std::vector<int> v : columns){
         std::cout << "\n";
         for (int n : v){
@@ -77,5 +69,6 @@ int main() {
 
     } // for vector in columns
     std::cout << "\nsize of image = " << columns.size() << "x" << columns[0].capacity() << std::endl;
+    std::cout << "Type of column[0] = " << typeid(columns[0]).name() << std::endl;
     return 0;
 }
