@@ -31,8 +31,8 @@ namespace project {
            {
               assert(!file.eof());
               file.get(pixel);
-              if(pixel) figure[i][j] = 1;
-              else figure[i][j] = 0;
+              if(pixel) figure[j][i] = 1;
+              else figure[j][i] = 0;
            }
        if(!file.eof())
        {
@@ -53,7 +53,6 @@ namespace project {
 int main(int argc, char** argv) {
     auto source = std::ifstream();
     auto columns = project::get_vect(argv[1]);
-    //project::in(&source);
 
     std::cout << "\n-----\n-----\n-----\n";
     // Print out image
@@ -62,13 +61,13 @@ int main(int argc, char** argv) {
     // but I left it as is, it's clearly what you were intending to do
     //
     for(std::vector<int> v : columns){
-        std::cout << "\n";
+
         for (int n : v){
             std::cout << n;
         } // for n in vector
-
+        std::cout << "\n";
     } // for vector in columns
+
     std::cout << "\nsize of image = " << columns.size() << "x" << columns[0].capacity() << std::endl;
-    std::cout << "Type of column[0] = " << typeid(columns[0]).name() << std::endl;
     return 0;
 }
