@@ -5,11 +5,19 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <algorithm>
 #include <iterator>
 
 #include "read.cpp"
 
-std::vector<std::vector<int>> get_vect(std::string filename);
+class VectorArray{
+public:
+    int x_size;
+    int y_size;
+    std::vector<std::vector<int>> get_vect(std::string filename);
+    std::vector<std::vector<int>> make_mask(int r);
+private:
+
+};
+
 
 #endif //PIXELSTOCIRCLES_READ_H
