@@ -7,17 +7,25 @@
 #include <vector>
 #include <iterator>
 
-#include "read.cpp"
 
 class VectorArray{
+
+private:
+
 public:
     int x_size;
     int y_size;
-    std::vector<std::vector<int>> get_vect(std::string filename);
+    std::vector<std::vector<int>> image;
+    std::vector<std::vector<int>> approximation;
+
+
+    void make_vect(std::string filename);
     std::vector<std::vector<int>> make_mask(int r);
-private:
+    bool overlap(int x, int y, int r);
+    bool overlap2(int x, int y, int r);
+    void compress();
+    void Clean_Approx();
 
 };
-
 
 #endif //PIXELSTOCIRCLES_READ_H
