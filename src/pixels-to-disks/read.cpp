@@ -94,22 +94,6 @@ void VectorArray::compress() {
     }
 }
 
-void VectorArray::Clean_Approx2(){
-// Remove unnecessary points
-    for (int y = 0; y < this->y_size; y++) {
-        for (int x = 0; x < this->x_size; x++) {
-            //std::cout << "Loop y, x = " << y << " " << x << std::endl;
-            for (int j = -1; j <= 1; j++) {
-                for (int i = -1; i <= 1; i++) {
-                    // Avoids stepping outside the array
-                    if(y+j >= 0) if(x+i >= 0) if(y+j < this->y_size) if(x+i < this->x_size){
-                    if (this->approximation[y][x] < this->approximation[y + j][x + i]) {
-                        this->approximation[y][x] = 0;
-                    }} // if if
-            }} // For j and i
-    }} // For y and x
-}
-
 void VectorArray::Clean_Approx(){
 // Remove unnecessary points
 int r=2;
@@ -129,16 +113,28 @@ int r=2;
     }} // For y and x
 }
 
-/*
+
 void VectorArray::PrintOut(std::ostream* target){
-    *target << this->x_size << " " << this->y_size << "\n";
-    if(!this->data) return;
-    for(int y = 0; y < this->y_size; y++)
-    {
-        for(int x = 0; x < this->x_size; x++)
-            if(num) *target << (unsigned)(this->get_pixel(x, y)) << "\t";
-            else *target << this->get_pixel(x, y);
-        if(num) *target << "\n";
+    *target << this->x_size << " " << this->y_size << "\n" << this->background_color << "\n\n";
+
+    std::vector<std::vector<int>> figure(this->y_size, std::vector<int>(4));
+    this->disks = figure;
+
+    int index = 0;
+    for (int y = 0; y < this->y_size; y++) {
+        for (int x = 0; x < this->x_size; x++) {
+            if(this->approximation[y][x] != 0){
+                this->disks[index] = {x, y, this->approximation[y][x], 255};
+                index++;
+            }
+        }
+    }
+    *target << index <<"\n";
+
+    for (int i = 0; i < index; i++){
+        for (int element : this->disks[i]){
+            *target << element << "\t";
+        }
+        *target << "\n";
     }
 }
-*/
