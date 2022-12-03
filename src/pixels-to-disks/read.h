@@ -15,9 +15,9 @@ private:
 public:
     int x_size;
     int y_size;
+    int bg_color = 0;
     std::vector<std::vector<int>> image;
     std::vector<std::vector<int>> approximation;
-
 
     void make_vect(std::string filename);
     std::vector<std::vector<int>> make_mask(int r);
@@ -25,6 +25,8 @@ public:
     bool overlap2(int x, int y, int r);
     void compress();
     void Clean_Approx();
+    void Clean_Approx2();
+    void PrintOut(std::ostream* target);
 
 };
 

@@ -43,24 +43,6 @@ void VectorArray::make_vect(std::string filename) {
     this->image = figure;
 } // make_vect
 
-std::vector<std::vector<int>> VectorArray::make_mask(int r) {
-    const int max_y = r + r + 1;
-    const int center = r; // index counts from 0
-    // Construct a 2D vector
-    std::vector<std::vector<int>> mask(max_y, std::vector<int>(max_y));
-
-    for (int y = 0; y < max_y; y++) {
-        for (int x = 0; x < max_y; x++) {
-            // Calculates if the square is inside a circle with radius r
-            float dd = (x - center) * (x - center) + (y - center) * (y - center);
-            if (r * r >= dd) mask[y][x] = 1;
-            else mask[y][x] = 0;
-        }
-    }
-    return mask;
-}
-
-
 bool VectorArray::overlap(int x, int y, int r) {
 
     assert(x >= 0);
@@ -101,9 +83,8 @@ void VectorArray::compress() {
     std::vector<std::vector<int>> figure(this->y_size, std::vector<int>(this->x_size));
     this->approximation = figure;
 
-    int passes = 0;
-    for (int y = 0; y <= this->y_size - 1; y++) {
-        for (int x = 0; x <= this->x_size - 1; x++) {
+    for (int y = 0; y < this->y_size; y++) {
+        for (int x = 0; x < this->x_size; x++) {
             int r = 1;
             while (VectorArray::overlap(x, y, r)) {
                 r++;
@@ -113,18 +94,51 @@ void VectorArray::compress() {
     }
 }
 
-void VectorArray::Clean_Approx(){
+void VectorArray::Clean_Approx2(){
 // Remove unnecessary points
-    for (int y = 0; y <= this->y_size - 1; y++) {
-        for (int x = 0; x <= this->x_size - 1; x++) {
+    for (int y = 0; y < this->y_size; y++) {
+        for (int x = 0; x < this->x_size; x++) {
             //std::cout << "Loop y, x = " << y << " " << x << std::endl;
             for (int j = -1; j <= 1; j++) {
                 for (int i = -1; i <= 1; i++) {
                     // Avoids stepping outside the array
-                    if(y-1 >= 0) if(x-1 >= 0) if(y+1 <= this->y_size-1) if(x+1 <= this->x_size-1){
+                    if(y+j >= 0) if(x+i >= 0) if(y+j < this->y_size) if(x+i < this->x_size){
                     if (this->approximation[y][x] < this->approximation[y + j][x + i]) {
                         this->approximation[y][x] = 0;
                     }} // if if
             }} // For j and i
     }} // For y and x
 }
+
+void VectorArray::Clean_Approx(){
+// Remove unnecessary points
+int r=2;
+    for (int y = 0; y < this->y_size; y++) {
+        for (int x = 0; x < this->x_size; x++) {
+            //std::cout << "Loop y, x = " << y << " " << x << std::endl;
+            for (int j = -r; j <= r; j++) {
+                for (int i = -r; i <= r; i++) {
+                    // Avoids checking own cell
+                    if((j!=0) || (i!=0)){
+                        // Avoids stepping outside the array
+                        if(y+j >= 0) if(x+i >= 0) if(y+j < this->y_size) if(x+i < this->x_size){
+                            if (this->approximation[y][x] <= this->approximation[y + j][x + i]) {
+                                this->approximation[y][x] = 0;}
+                    }} // if if
+            }} // For j and i
+    }} // For y and x
+}
+
+/*
+void VectorArray::PrintOut(std::ostream* target){
+    *target << this->x_size << " " << this->y_size << "\n";
+    if(!this->data) return;
+    for(int y = 0; y < this->y_size; y++)
+    {
+        for(int x = 0; x < this->x_size; x++)
+            if(num) *target << (unsigned)(this->get_pixel(x, y)) << "\t";
+            else *target << this->get_pixel(x, y);
+        if(num) *target << "\n";
+    }
+}
+*/
