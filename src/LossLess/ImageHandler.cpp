@@ -11,7 +11,6 @@ bool sortbysecdesc(const std::pair<std::pair<int, int>, int> &a, const std::pair
                         return a.second>b.second;
                 }
 
-
 class ImageHandler {
 	
 	public:		// Acsess specifier 
@@ -50,7 +49,6 @@ class ImageHandler {
 				}
 			}
 		}
-
 
 		void GenerateRandomCircles() {
 			// Draws Random circles until our own map is equal to the Image
@@ -93,8 +91,6 @@ class ImageHandler {
 			PrintImage(OwnMap, "Pairs");
 		}
 		
-
-
 	private:
 		int x_rand;
 		int y_rand;
@@ -111,7 +107,6 @@ class ImageHandler {
 			} else{
 				return r-1;
 			       } 
-			
 		}	
 
 		bool ZeroEdges(int x, int y, int r) {
@@ -164,10 +159,7 @@ class ImageHandler {
 			bool home = (OwnMap[x][y] == 0);
 			return home;
 		}
-
 };
-
-
 
 
 int main() {
@@ -180,11 +172,9 @@ int main() {
 	
 	MyImage.OwnMap = MyImage.CreateMap(MyImage.Image);
 
-//	MyImage.GenerateRandomCircles();
+//	MyImage.GenerateRandomCircles(); // Use this in order to reproduce the image by random generation
 	
-	MyImage.DrawFromPairs();
+	MyImage.DrawFromPairs(); // Use this in order to generate circles from pairs method
 	
 	return 0;
 }
-
-
