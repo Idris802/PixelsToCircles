@@ -7,6 +7,7 @@
 #include <vector>
 #include <iterator>
 #include <cmath>
+#include <chrono>
 
 #include <omp.h>
 
@@ -29,7 +30,6 @@ public:
     std::vector<std::vector<int>> disks;
 
     void make_vect(std::string filename);
-    std::vector<std::vector<int>> make_mask(int r);
     bool overlap(int x, int y, int r);
     void compress();
     void Clean_Approx();

@@ -3,6 +3,8 @@
 #include <vector>
 #include <iterator>
 #include <fstream>  // Used in make_vect std::ifstream
+#include <chrono>
+#include <cmath>
 
 #include <omp.h>
 
@@ -209,9 +211,6 @@ void VectorArray::PrintOut(std::ostream* target){
 
     // Iterates through each disk and prints out its contents
     int work_shared = 1 + (this->num_disks - 1)/this->num_threads;
-    std::cout << "Num_disks = " << this->num_disks << std::endl;
-    std::cout << "Num_threads = " << this->num_threads << std::endl;
-    std::cout << "Work_shared = " << work_shared << std::endl;
 
     #pragma omp parallel
     {
@@ -234,21 +233,39 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
     /*
      * A single function to convert a pixelmap to a vector representation of disks
      */
-
+    auto t0 = std::chrono::high_resolution_clock::now();
     VectorArray::make_vect(input_filename);
     std::cout << "Make vect PASS" << std::endl;
+    auto t_make_vect = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long, std::ratio<1, 1000000000>>> t_compress;
     #pragma omp parallel
     {
     VectorArray::compress();
+    #pragma omp single
     std::cout << "Compress PASS" << std::endl;
     #pragma omp barrier
+    #pragma omp single
+    t_compress = std::chrono::high_resolution_clock::now();
     VectorArray::Clean_Approx();
+    #pragma omp single
     std::cout << "Clean approx PASS" << std::endl;
     #pragma omp barrier
     }
-    std::cout << "Exited parallel" << std::endl;
+    auto t_clean = std::chrono::high_resolution_clock::now();
     std::ofstream output(output_filename);
     VectorArray::PrintOut(&output);
     output.close();
     std::cout << "Printout PASS" << std::endl;
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+
+    auto time_make_vect = std::chrono::duration_cast<std::chrono::nanoseconds>(t_make_vect-t0).count()/std::pow(10,6);
+    auto time_compress = std::chrono::duration_cast<std::chrono::nanoseconds>(t_compress - t_make_vect).count()/std::pow(10,6);
+    auto time_approx = std::chrono::duration_cast<std::chrono::nanoseconds>(t_clean - t_compress).count()/std::pow(10,6);
+    auto time_printout = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t_clean).count()/std::pow(10,6);
+    std::cout << "Make vect = " << time_make_vect << " ms\n";
+    std::cout << "Compress  = " << time_compress << " ms\n";
+    std::cout << "Approx    = " << time_approx << " ms\n";
+    std::cout << "Print out = " << time_printout << " ms\n";
+
 }
