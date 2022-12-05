@@ -47,11 +47,8 @@ int main(int argc, char** argv) {
         std::string path = argv[1];
 
         auto t0 = std::chrono::high_resolution_clock::now();
-
         std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long, std::ratio<1, 1000000000>>> t1;
-
         std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long, std::ratio<1, 1000000000>>> t2;
-
 
         #pragma omp parallel
         {
