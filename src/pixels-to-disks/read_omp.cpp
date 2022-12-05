@@ -51,13 +51,11 @@ bool VectorArray::overlap(int x, int y, int r) {
      */
 
     // Checking valid inputs
-    /*
     assert(x >= 0);
     assert(x < x_size);
     assert(y >= 0);
     assert(y < y_size);
     assert(r >= 0);
-    */
 
     // Limiting search ranges
     int x_min = -r;
@@ -117,7 +115,7 @@ void VectorArray::Clean_Approx(){
      * Remove unnecessary points from the approximation map
      */
 
-    int r=2; // Radius around each cell we compare against
+    int r=1; // Radius around each cell we compare against
 
     // Iterates through each cell in the map, sliced for each rank
     for (int y = this->split*omp_get_thread_num(); y < this->split*(omp_get_thread_num()+1); y++) {
@@ -181,8 +179,6 @@ void VectorArray::PrintOut(std::ostream* target){
         }
     } // omp parallel
 
-    std::cout << "Create disk vectors PASS" << std::endl;
-
     // Prints out number of disks
     *target << this->num_disks <<'\n';
 
@@ -213,29 +209,34 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
      */
     auto t0 = std::chrono::high_resolution_clock::now();
     VectorArray::make_vect(input_filename);
-    std::cout << "Make vect PASS" << std::endl;
+
     auto t_make_vect = std::chrono::high_resolution_clock::now();
     std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long, std::ratio<1, 1000000000>>> t_compress;
+
     #pragma omp parallel
     {
     VectorArray::compress();
 
     #pragma omp barrier
     #pragma omp single
-        {
-            std::cout << "Compress PASS" << std::endl;
+        {/*
+            for (std::vector<int> v : this->approximation){
+                for (int n : v){
+                    std::cout << n;
+                }
+                std::cout << std::endl;
+            }
+            */
             t_compress = std::chrono::high_resolution_clock::now();
         }
     VectorArray::Clean_Approx();
-    #pragma omp single
-    std::cout << "Clean approx PASS" << std::endl;
     #pragma omp barrier
     }
     auto t_clean = std::chrono::high_resolution_clock::now();
     std::ofstream output(output_filename);
     VectorArray::PrintOut(&output);
     output.close();
-    std::cout << "Printout PASS" << std::endl;
+
     auto t1 = std::chrono::high_resolution_clock::now();
 
 

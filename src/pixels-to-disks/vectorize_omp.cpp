@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
     VectorArray VArray;
 
     if (argc == 4) VArray.num_threads = std::atoi(argv[3]);
+    omp_set_num_threads(VArray.num_threads);
 
     VArray.vectorize(argv[1], argv[2]);
 
