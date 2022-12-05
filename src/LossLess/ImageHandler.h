@@ -13,7 +13,7 @@
 // Used to sort pair vector in DrawFromPairs 
 bool sortbysecdesc(const std::pair<std::pair<int, int>, int> &a, const std::pair<std::pair<int, int>, int> &b){
                         return a.second>b.second;
-                }
+               }
 
 
 class ImageHandler {
@@ -43,7 +43,6 @@ class ImageHandler {
 		std::vector<std::vector<int>> CreateMap(std::vector<std::vector <int>> Image){		
 			int size = Image.size();
 			std::vector<std::vector <int>> OwnMap(size, std::vector<int> (size, 0));
-			std::cout << "The size of our own Image "<< OwnMap.size() << " x "<< OwnMap[0].size() << std::endl;
 			return OwnMap;
 		}
 
@@ -71,6 +70,7 @@ class ImageHandler {
 				
 				if (CheckHome(x, y, r)) {
 					DrawCircle(x, y, r);
+
 					CountCircles++;
 				}
 			}
@@ -98,10 +98,9 @@ class ImageHandler {
 				if (this->CheckHome(x, y, r)){
 					DrawCircle(x, y, r);
 					myfile << x << "\t" << y << "\t" << r << "\t" << DiskColor << "\n";
-
 				}
 
-				if (OwnMap == Image) {
+				if (Image == OwnMap) {
 					myfile.close();
 					break;
 				}
@@ -110,9 +109,7 @@ class ImageHandler {
 			std::cout << "Circle Count = " << TrueCount << " Process: ";
 			PrintImage(OwnMap, "Pairs");
 		}
-		
-
-
+	
 	private:
 		int x_rand;
 		int y_rand;
@@ -124,12 +121,11 @@ class ImageHandler {
 
 		int GetMaximumRadius(int x, int y, int r, int size) {
 			// Gets maximum radius for random generated x and y coordinate
-			if (CheckEdges(x, y, r, size) && ZeroEdges(x, y, r)) {
+			if (CheckEdges(x, y, r, size) && ZeroEdges(x, y, r) && CheckDiagonals(x, y, r)) {
 				return GetMaximumRadius(x, y, r+1, Image.size());
 			} else{
 				return r-1;
-			       } 
-			
+			       }	
 		}	
 
 		bool ZeroEdges(int x, int y, int r) {
@@ -140,6 +136,21 @@ class ImageHandler {
 			} else {return false;}
 		}
 
+		bool CheckDiagonals(int x, int y, int r) {
+			int radius = floor(r*(sqrt(2)/2));
+			int up_x = x-radius;
+			int down_x = x+radius;
+			int y_right = y+radius;
+			int y_left = y-radius;
+
+			if (Image[up_x][y_right] != BackGround && Image[up_x][y_left] != BackGround 
+			    && Image[up_x][y_right] != BackGround && Image[down_x][y_left] != BackGround) {
+				return true;
+			} else {return false;}
+			
+		}
+
+		
 		bool CheckEdges(int x, int y, int r, int size) {
 			// Checks if radius is within the image boundaries
 			if (x-r > 0 && x+r < size && y-r > 0 && y+r < size) {
@@ -178,7 +189,7 @@ class ImageHandler {
 	        }
 
 		bool CheckHome(int x, int y, int r) {
-			// This function only checks if the current point has been drawn on already and if the neighbouring pixels are available
+			// This function only checks if the current point has been drawn on already
 			
 			bool home = (OwnMap[x][y] == BackGround);
 			return home;
