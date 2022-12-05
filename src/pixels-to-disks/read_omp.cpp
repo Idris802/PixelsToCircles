@@ -51,11 +51,13 @@ bool VectorArray::overlap(int x, int y, int r) {
      */
 
     // Checking valid inputs
+    /*
     assert(x >= 0);
     assert(x < x_size);
     assert(y >= 0);
     assert(y < y_size);
     assert(r >= 0);
+    */
 
     // Limiting search ranges
     int x_min = -r;
@@ -97,8 +99,8 @@ void VectorArray::compress() {
     // Divides the work load based on number of threads
     this->split = 1 + (y_size - 1) / this->num_threads;
     // Tests which radius fits in each cell
-    if (omp_get_thread_num() != this->num_threads - 1) {
-        for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * split; y++) {
+    for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * split; y++) {
+        if (y < this->y_size) {
             for (int x = 0; x < this->x_size; x++) {
                 int r = 1;
                 while (VectorArray::overlap(x, y, r)) {
@@ -106,18 +108,7 @@ void VectorArray::compress() {
                 }
                 this->approximation[y][x] = r - 1;
             }
-        }
-    }
-    else{
-        for (int y = omp_get_thread_num() * split; y < this->y_size; y++) {
-            for (int x = 0; x < this->x_size; x++) {
-                int r = 1;
-                while (VectorArray::overlap(x, y, r)) {
-                    r++;
-                }
-                this->approximation[y][x] = r - 1;
-            }
-        }
+        } // if
     }
 }
 
@@ -169,8 +160,8 @@ void VectorArray::PrintOut(std::ostream* target){
     {
         std::vector<std::vector<int>> figure(0, std::vector<int>(4));
 
-        if (omp_get_thread_num() != this->num_threads - 1) {
             for (int y = this->split * omp_get_thread_num(); y < (omp_get_thread_num() + 1) * this->split; y++) {
+                if (y < this->y_size){
                     for (int x = 0; x < this->x_size; x++) {
                         // Checks a list of radii, hens !=bg_color
                         if (this->approximation[y][x] != this->background_color) {
@@ -182,19 +173,6 @@ void VectorArray::PrintOut(std::ostream* target){
                     }
                 }
             }
-        else {
-            for (int y = this->split * omp_get_thread_num(); y < this->y_size; y++) {
-                for (int x = 0; x < this->x_size; x++) {
-                    // Checks a list of radii, hens !=bg_color
-                    if (this->approximation[y][x] != this->background_color) {
-                        // Disk {x_coordinate, y_coordinate, radius, color}
-                        figure.push_back({x, y, this->approximation[y][x], this->foreground_color});
-                        #pragma omp atomic
-                        this->num_disks++;
-                    }
-                }
-            }
-        }
 
         for (std::vector<int> v : figure)
         {
@@ -241,11 +219,13 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
     #pragma omp parallel
     {
     VectorArray::compress();
-    #pragma omp single
-    std::cout << "Compress PASS" << std::endl;
+
     #pragma omp barrier
     #pragma omp single
-    t_compress = std::chrono::high_resolution_clock::now();
+        {
+            std::cout << "Compress PASS" << std::endl;
+            t_compress = std::chrono::high_resolution_clock::now();
+        }
     VectorArray::Clean_Approx();
     #pragma omp single
     std::cout << "Clean approx PASS" << std::endl;

@@ -1,6 +1,7 @@
 #include "read_omp.h"
 #include <omp.h>
 #include <chrono>
+#include <cmath>
 
 int main(int argc, char** argv) {
     // argv[1] = input filename
@@ -19,8 +20,8 @@ int main(int argc, char** argv) {
 
     auto t1 = std::chrono::high_resolution_clock::now();
 
-    auto ms = std::chrono::duration_cast<std::chrono::nanoseconds>(t1-t0).count()/std::pow(10,6);
-    std::cout << "finished with " << ms << " ms elapsed";
+    auto total_time = std::chrono::duration_cast<std::chrono::nanoseconds>(t1-t0).count()/std::pow(10,6);
+    std::cout << "finished with " << total_time << " ms elapsed" << std::endl;
 
     return 0;
 }
