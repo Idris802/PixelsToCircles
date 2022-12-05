@@ -137,6 +137,8 @@ class ImageHandler {
 		}
 
 		bool CheckDiagonals(int x, int y, int r) {
+			// Checks if the pixels on the diagonals are not background
+			
 			int radius = floor(r*(sqrt(2)/2));
 			int up_x = x-radius;
 			int down_x = x+radius;
