@@ -211,6 +211,12 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
     #pragma omp single
         {
             t_compress = std::chrono::high_resolution_clock::now();
+            for (std::vector<int> v : this->approximation){
+                for (int n : v){
+                    std::cout << n;
+                }
+                std::cout << std::endl;
+            }
         }
     VectorArray::Clean_Approx();
     #pragma omp barrier

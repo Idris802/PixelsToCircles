@@ -80,7 +80,7 @@ bool VectorArray::overlap(int x, int y, int r) {
         }
     }
     // Checks if a percentage of the circle tiles are lit up
-    if (matches/tiles > 0.9) return true;
+    if (matches/tiles > 0.85) return true;
     else return false;
 }
 
@@ -138,10 +138,10 @@ void VectorArray::PrintOut(std::ostream* target){
     // Prints out:
     // x y
     // background color
-    *target << this->x_size << " " << this->y_size << "\n" << this->background_color << "\n\n";
+    *target << this->x_size << " " << this->y_size << '\n' << this->background_color << "\n\n";
 
     // Creates a large vector array to hold the vector representation of the disks
-    std::vector<std::vector<int>> figure(this->y_size, std::vector<int>(4));
+    std::vector<std::vector<int>> figure((this->y_size*this->x_size)/2, std::vector<int>(4));
     this->disks = figure;
 
     int index = 0;
@@ -155,14 +155,14 @@ void VectorArray::PrintOut(std::ostream* target){
         }
     }
     // Prints out number of disks
-    *target << index <<"\n";
+    *target << index <<'\n';
 
     // Iterates through each disk and prints out its contents
     for (int i = 0; i < index; i++){
         for (int element : this->disks[i]){
-            *target << element << "\t";
+            *target << element << '\t';
         }
-        *target << "\n";
+        *target << '\n';
     }
 }
 
