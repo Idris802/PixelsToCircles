@@ -84,6 +84,7 @@ void VectorArray::compress() {
 
     // Divides the work load based on number of threads
     this->split = 1 + (this->y_size - 1) / this->num_threads;
+
     // Tests which radius fits in each cell
     for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * this->split; y++) {
         if (y < this->y_size) {
@@ -211,12 +212,6 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
     #pragma omp single
         {
             t_compress = std::chrono::high_resolution_clock::now();
-            for (std::vector<int> v : this->approximation){
-                for (int n : v){
-                    std::cout << n;
-                }
-                std::cout << std::endl;
-            }
         }
     VectorArray::Clean_Approx();
     #pragma omp barrier
