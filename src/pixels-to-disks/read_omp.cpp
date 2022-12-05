@@ -14,6 +14,7 @@ void VectorArray::make_vect(std::string filename) {
     /*
     * Based on code by Martin Thomas Horsch
     */
+
     // Read from start of file
     std::ifstream file(filename);
     file >> this->x_size >> this->y_size;
@@ -34,14 +35,6 @@ void VectorArray::make_vect(std::string filename) {
             if (pixel) this->image[j][i] = this->foreground_color;
             else this->image[j][i] = this->background_color;
         }
-    //if (!file.eof()) {
-        //std::cout << "remaining content of file:\n";
-        //while (!file.eof()) {
-            //file.get(pixel);
-            //std::cout << "\t'" << pixel << "' (ASCII " << (unsigned)pixel % 256 << ")\n";
-        //}
-    //}
-
     file.close();
 } // make_vect
 
@@ -49,13 +42,6 @@ bool VectorArray::overlap(int x, int y, int r) {
     /*
      * Returns true if a circle with radius r fits on cell x, y
      */
-
-    // Checking valid inputs
-    assert(x >= 0);
-    assert(x < x_size);
-    assert(y >= 0);
-    assert(y < y_size);
-    assert(r >= 0);
 
     // Limiting search ranges
     int x_min = -r;
@@ -70,12 +56,14 @@ bool VectorArray::overlap(int x, int y, int r) {
 
     int tiles = 0; // Number of tiles in the circle
     int matches = 0; // Number of lit up tiles
+    // Checking neighboring cells
     for (int j = y_min; j <= y_max; j++) {
         for (int i = x_min; i <= x_max; i++) {
-            // Calculates if the square is inside a circle with radius r
+            // Calculates if the cell is inside a circle with radius r
             float dd = (x+i - x) * (x+i - x) + (y+j - y) * (y+j - y);
             if (r * r >= dd) {
                 tiles++;
+                // Checks color of that cell
                 if(this->image[y+j][x+i] == this->foreground_color) matches++;
             }
         }
@@ -95,9 +83,9 @@ void VectorArray::compress() {
     this->approximation = figure;
 
     // Divides the work load based on number of threads
-    this->split = 1 + (y_size - 1) / this->num_threads;
+    this->split = 1 + (this->y_size - 1) / this->num_threads;
     // Tests which radius fits in each cell
-    for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * split; y++) {
+    for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * this->split; y++) {
         if (y < this->y_size) {
             for (int x = 0; x < this->x_size; x++) {
                 int r = 1;
@@ -108,14 +96,14 @@ void VectorArray::compress() {
             }
         } // if
     }
-}
+} // Compress()
 
 void VectorArray::Clean_Approx(){
     /*
      * Remove unnecessary points from the approximation map
      */
 
-    int r=1; // Radius around each cell we compare against
+    int r=2; // Radius around each cell we compare against
 
     // Iterates through each cell in the map, sliced for each rank
     for (int y = this->split*omp_get_thread_num(); y < this->split*(omp_get_thread_num()+1); y++) {
@@ -125,7 +113,8 @@ void VectorArray::Clean_Approx(){
                 for (int j = -r; j <= r; j++) {
                     for (int i = -r; i <= r; i++) {
                         // Avoids checking own cell
-                        if ((j != 0) || (i != 0)) {
+                        if ((j == 0) && (i == 0)) continue;
+                        else{
                             // Avoids stepping outside the array
                             if (y + j >= 0)
                                 if (x + i >= 0)
@@ -163,7 +152,7 @@ void VectorArray::PrintOut(std::ostream* target){
                     for (int x = 0; x < this->x_size; x++) {
                         // Checks a list of radii, hens !=bg_color
                         if (this->approximation[y][x] != this->background_color) {
-                            // Disk {x_coordinate, y_coordinate, radius, color}
+                            // Adds a disk vector to its figure, Disk {x_coordinate, y_coordinate, radius, color}
                             figure.push_back({x, y, this->approximation[y][x], this->foreground_color});
                             #pragma omp atomic
                             this->num_disks++;
@@ -171,7 +160,7 @@ void VectorArray::PrintOut(std::ostream* target){
                     }
                 }
             }
-
+        // Collects all Disk vectors to a single vector
         for (std::vector<int> v : figure)
         {
             #pragma omp critical
@@ -207,6 +196,7 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
     /*
      * A single function to convert a pixelmap to a vector representation of disks
      */
+
     auto t0 = std::chrono::high_resolution_clock::now();
     VectorArray::make_vect(input_filename);
 
@@ -219,14 +209,7 @@ void VectorArray::vectorize(std::string input_filename, std::string output_filen
 
     #pragma omp barrier
     #pragma omp single
-        {/*
-            for (std::vector<int> v : this->approximation){
-                for (int n : v){
-                    std::cout << n;
-                }
-                std::cout << std::endl;
-            }
-            */
+        {
             t_compress = std::chrono::high_resolution_clock::now();
         }
     VectorArray::Clean_Approx();

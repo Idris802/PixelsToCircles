@@ -12,11 +12,14 @@ int main(int argc, char** argv) {
 
     if(argc < 3) return EXIT_FAILURE;
 
+    // Initiating the class
     VectorArray VArray;
 
+    // Determining and setting number of threads
     if (argc == 4) VArray.num_threads = std::atoi(argv[3]);
     omp_set_num_threads(VArray.num_threads);
 
+    // Executing the program
     VArray.vectorize(argv[1], argv[2]);
 
     auto t1 = std::chrono::high_resolution_clock::now();

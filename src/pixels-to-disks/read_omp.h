@@ -14,10 +14,7 @@
 class VectorArray{
 
 private:
-
-public:
-    // OpenMP parameters
-    int num_threads = 1;
+    // omp parameters
     int split;
     int num_disks = 0;
 
@@ -34,8 +31,11 @@ public:
     void compress();
     void Clean_Approx();
     void PrintOut(std::ostream* target);
-    void vectorize(std::string input_filename, std::string output_filename);
 
+public:
+    // OpenMP parameters
+    int num_threads = 1;
+    void vectorize(std::string input_filename, std::string output_filename);
 };
 
 #endif //PIXELSTOCIRCLES_READ_OMP_H
