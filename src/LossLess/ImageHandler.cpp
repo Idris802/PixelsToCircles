@@ -6,11 +6,13 @@
 
 
 void DoRandomProcess(std::string path) {
+        /*
+         * Uses the method DrawFromPairs of the ImageHandler class
+         */
         ImageHandler MyImage; // Create an object for the image
         MyImage.FileName = path;
         MyImage.BackGround = 0;
         MyImage.DiskColor = 1;
-
 
         MyImage.Image = get_vect(MyImage.FileName);
         MyImage.PrintImage(MyImage.Image, "Original Image");
@@ -21,6 +23,9 @@ void DoRandomProcess(std::string path) {
 }
 
 void DoPairProcess(std::string path) {
+        /*
+         * Uses the method DrawFromPairs of the ImageHandler class
+         */
         ImageHandler MyImage; // Create an object for the image
         MyImage.FileName = path;
         MyImage.BackGround = 0;
@@ -36,11 +41,10 @@ void DoPairProcess(std::string path) {
 
 
 int main(int argc, char** argv) {
-
+        
+        // Used for mp with dual processing.
         omp_set_num_threads(2);
         std::string path = argv[1];
-
-
 
         auto t0 = std::chrono::high_resolution_clock::now();
 
