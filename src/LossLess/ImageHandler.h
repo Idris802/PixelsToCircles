@@ -79,6 +79,9 @@ class ImageHandler {
 		}
 
 		void DrawFromPairs() {
+			// Draws Circles using the pairs starting with largest radius until the map is equal to the image or all pairs have been used.
+			// And writes data to output file.
+			
 			std::vector<std::pair<std::pair<int, int>, int>> p = this->FindPairs();					
 			std::sort(p.begin(), p.end(), sortbysecdesc);
 			int TrueCount = CountTrueCircles(p);
@@ -121,6 +124,7 @@ class ImageHandler {
 
 		int GetMaximumRadius(int x, int y, int r, int size) {
 			// Gets maximum radius for random generated x and y coordinate
+			
 			if (CheckEdges(x, y, r, size) && ZeroEdges(x, y, r) && CheckDiagonals(x, y, r)) {
 				return GetMaximumRadius(x, y, r+1, Image.size());
 			} else{
@@ -130,6 +134,7 @@ class ImageHandler {
 
 		bool ZeroEdges(int x, int y, int r) {
 			// Checks for how much the radius can be incremented before hitting a zero on the image
+			
 			if (Image[x-r][y] != BackGround && Image[x][y+r] != BackGround && 
 				Image[x+r][y] != BackGround && Image[x][y-r] != BackGround) {
 				return true;
@@ -155,6 +160,7 @@ class ImageHandler {
 		
 		bool CheckEdges(int x, int y, int r, int size) {
 			// Checks if radius is within the image boundaries
+			
 			if (x-r > 0 && x+r < size && y-r > 0 && y+r < size) {
 				return true;
 			} else {return false;}
@@ -162,6 +168,7 @@ class ImageHandler {
 
 		int SelectPoints() {	
 			// Selects random points that are not background color 
+			
 			x_rand = 0 + (rand()%OwnMap.size());
 			y_rand = 0 + (rand()%OwnMap.size());
 				
@@ -174,7 +181,7 @@ class ImageHandler {
 		}
 
 		std::vector<std::pair<std::pair<int, int>, int>> FindPairs() {
-	                // This functions should find all pixelvalues pixel(i, j) that are non zeros and store them
+	                // This functions should find all pixelvalues pixel(i, j) that are non zeros and store them as well as their maximum radius.
 
 	                std::vector<std::pair<std::pair<int, int>, int>> PixPairsRadius;
 
@@ -198,6 +205,8 @@ class ImageHandler {
 		}
 
 		int CountTrueCircles(std::vector<std::pair<std::pair<int, int>, int>> p){
+			// Counts Circles that are truly being used i.e exluding repition
+			
 			for (auto pair: p) {
 
                                 int x = pair.first.first;
