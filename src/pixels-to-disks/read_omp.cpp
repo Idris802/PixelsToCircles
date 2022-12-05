@@ -3,7 +3,6 @@
 #include <vector>
 #include <iterator>
 #include <fstream>  // Used in make_vect std::ifstream
-#include <cmath>
 
 #include <omp.h>
 
@@ -94,7 +93,7 @@ void VectorArray::compress() {
     this->approximation = figure;
 
     // Divides the work load based on number of threads
-    this->split = std::ceil(y_size / this->num_threads);
+    this->split = 1 + (y_size - 1) / this->num_threads;
     // Tests which radius fits in each cell
     if (omp_get_thread_num() != this->num_threads - 1) {
         for (int y = omp_get_thread_num() * this->split; y < (omp_get_thread_num() + 1) * split; y++) {
@@ -128,10 +127,10 @@ void VectorArray::Clean_Approx(){
     int r=2; // Radius around each cell we compare against
 
     // Iterates through each cell in the map, sliced for each rank
-    if (omp_get_thread_num() != this->num_threads - 1) {
-        for (int y = this->split*omp_get_thread_num(); y < this->split*(omp_get_thread_num()+1); y++) {
+    for (int y = this->split*omp_get_thread_num(); y < this->split*(omp_get_thread_num()+1); y++) {
+        if (y < this->y_size) {
             for (int x = 0; x < this->x_size; x++) {
-                // Checks each neighbor around in a square
+                // Checks each neighbor in a square
                 for (int j = -r; j <= r; j++) {
                     for (int i = -r; i <= r; i++) {
                         // Avoids checking own cell
@@ -145,38 +144,11 @@ void VectorArray::Clean_Approx(){
                                             if (this->approximation[y][x] <= this->approximation[y + j][x + i]) {
                                                 this->approximation[y][x] = this->background_color;
                                             }
-                                        }
-                        } // if if
-                    }
-                } // For j and i
-            }
-        } // For y and x
-    }
-    // Copy of code above, except first for loop parameters statement
-    else{
-        for (int y = this->split*omp_get_thread_num(); y < this->y_size; y++) {
-            for (int x = 0; x < this->x_size; x++) {
-                // Checks each neighbor around in a square
-                for (int j = -r; j <= r; j++) {
-                    for (int i = -r; i <= r; i++) {
-                        // Avoids checking own cell
-                        if ((j != 0) || (i != 0)) {
-                            // Avoids stepping outside the array
-                            if (y + j >= 0)
-                                if (x + i >= 0)
-                                    if (y + j < this->y_size)
-                                        if (x + i < this->x_size) {
-                                            // Compares current cell with its neighbors
-                                            if (this->approximation[y][x] <= this->approximation[y + j][x + i]) {
-                                                this->approximation[y][x] = this->background_color;
-                                            }
-                                        }
-                        } // if if
-                    }
-                } // For j and i
-            }
-        } // For y and x
-    }
+                        }} // if if
+                    }} // For j and i
+            } // For x
+        } // if y < y_size
+    } // For y
 }
 
 
