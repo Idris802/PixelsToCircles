@@ -70,7 +70,6 @@ class ImageHandler {
 				
 				if (CheckHome(x, y, r)) {
 					DrawCircle(x, y, r);
-
 					CountCircles++;
 				}
 			}
@@ -174,7 +173,6 @@ class ImageHandler {
 				
 			if (Image[x_rand][y_rand] == BackGround) { 
 				SelectPoints();
-				CountCircles++;
 			}
 
 			return 0;
