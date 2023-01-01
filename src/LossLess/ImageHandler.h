@@ -214,7 +214,6 @@ class ImageHandler {
                                 if (this->CheckHome(x, y, r)){
                                         DrawCircle(x, y, r);
                                         CountCircles++;
-
                                 }
 
                                 if (OwnMap == Image) {
@@ -223,7 +222,6 @@ class ImageHandler {
                         }
 			return CountCircles;
 		}
-
 };
 
 #endif
